@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  mqtt-api:
+    build: .
+    container_name: mqtt-api
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - MQTT_BROKER=${MQTT_BROKER}
+      - MQTT_PORT=${MQTT_PORT:-1883}
+      - MQTT_KEEPALIVE=${MQTT_KEEPALIVE:-60}
+      - MQTT_USERNAME=${MQTT_USERNAME:-}
+      - MQTT_PASSWORD=${MQTT_PASSWORD:-}
+    restart: unless-stopped
+    networks:
+      - mqtt-network
+
+networks:
+  mqtt-network:
+    driver: bridge
