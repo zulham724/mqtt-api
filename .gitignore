@@ -42,3 +42,10 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Docker volumes data
+mosquitto-data/
+mosquitto-log/
+
+# Mosquitto persistence
+*.db

@@ -1,17 +1,37 @@
-version: '3.8'
+version: "3.8"
 
 services:
+  mosquitto:
+    build: 
+      context: .
+      dockerfile: Dockerfile.mosquitto
+    container_name: mosquitto
+    ports:
+      - "${TCP_PORT:-1883}:1883"
+      - "${WEBSOCKET_PORT:-9001}:9001"
+    volumes:
+      - ./mosquitto.conf:/etc/mosquitto/mosquitto.conf
+      - mosquitto-data:/var/lib/mosquitto
+      - mosquitto-log:/var/log/mosquitto
+    labels:
+      - "local.example.description=Mosquitto v1.6.9 MQTT server"
+    restart: unless-stopped
+    networks:
+      - mqtt-network
+
   mqtt-api:
     build: .
     container_name: mqtt-api
     ports:
       - "${API_PORT:-8000}:8000"
     environment:
-      - MQTT_BROKER=${MQTT_BROKER}
+      - MQTT_BROKER=mosquitto
       - MQTT_PORT=${MQTT_PORT:-1883}
       - MQTT_KEEPALIVE=${MQTT_KEEPALIVE:-60}
       - MQTT_USERNAME=${MQTT_USERNAME:-}
       - MQTT_PASSWORD=${MQTT_PASSWORD:-}
+    depends_on:
+      - mosquitto
     restart: unless-stopped
     networks:
       - mqtt-network
@@ -19,3 +39,7 @@ services:
 networks:
   mqtt-network:
     driver: bridge
+
+volumes:
+  mosquitto-data:
+  mosquitto-log:
